@@ -1,7 +1,11 @@
+using books_api.Data;
+using books_api.Data.Services;
+using books_api.Exceptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,9 +20,12 @@ namespace books_api
 {
     public class Startup
     {
+        public string ConnectionString { get; set; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            ConnectionString = Configuration.GetConnectionString("DefaultConnectionString");
         }
 
         public IConfiguration Configuration { get; }
@@ -28,6 +35,17 @@ namespace books_api
         {
 
             services.AddControllers();
+
+            //configure db context with sql
+
+            services.AddDbContext<AppDbContext>(options=>options.UseSqlServer(ConnectionString));
+
+            //services
+
+            services.AddTransient<BooksService>();
+            services.AddTransient<AuthorsService>();
+            services.AddTransient<PublisherService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "books_api", Version = "v1" });
@@ -50,10 +68,17 @@ namespace books_api
 
             app.UseAuthorization();
 
+            //exception handling
+
+            app.ConfigureBuildInExceptionHandler();
+            //app.ConfigureCustemExceptionHandler();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
+            //ApDbInitializer.Seed(app);
         }
     }
 }
