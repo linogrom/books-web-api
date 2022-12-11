@@ -14,19 +14,35 @@ namespace books_api.Controllers
     [ApiController]
     public class PublisherController : ControllerBase
     {
-        private PublisherService _publisherService;
+        private PublisherService _publishersService;
 
-        public PublisherController(PublisherService publisherService)
+        public PublisherController(PublisherService publishersService)
         {
-            _publisherService = publisherService;
+            _publishersService = publishersService;
         }
+
+        [HttpGet("get-all-publishers")]
+        public IActionResult GetAllPublishers(string sortBy, string searchString, int pageNumber)
+        {
+            try
+            {
+                var _result = _publishersService.GetAllPublishers(sortBy, searchString, pageNumber);
+                return Ok(_result);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Sorry, we could not load the publishers");
+            }
+        }
+
+
 
         [HttpPost("add-publisher")]
         public IActionResult AddPublisher([FromBody] PublisherVM publisher)
         {
             try
             {
-                var newPublisher = _publisherService.AddPublisher(publisher);
+                var newPublisher = _publishersService.AddPublisher(publisher);
                 return Created(nameof(AddPublisher), newPublisher);
             }
             catch (PublisherNameException ex)
@@ -44,7 +60,7 @@ namespace books_api.Controllers
         public IActionResult GetPublisherById(int id)
         {
 
-            var _response = _publisherService.GetPublisherById(id);
+            var _response = _publishersService.GetPublisherById(id);
             if (_response != null)
             {
                 return Ok(_response);
@@ -60,7 +76,7 @@ namespace books_api.Controllers
         [HttpGet("get-publisher-books-with-authors/{id}")]
         public IActionResult GetPublisherData(int id)
         {
-            var _response = _publisherService.GetPublisherData(id);
+            var _response = _publishersService.GetPublisherData(id);
             return Ok(_response);
         }
 
@@ -69,7 +85,7 @@ namespace books_api.Controllers
         {
             try
             {
-                _publisherService.DeletePublisherById(id);
+                _publishersService.DeletePublisherById(id);
                 return Ok();
             }
             catch (Exception ex)
