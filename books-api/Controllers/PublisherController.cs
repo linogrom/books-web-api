@@ -29,6 +29,7 @@ namespace books_api.Controllers
         [HttpGet("get-all-publishers")]
         public IActionResult GetAllPublishers(string sortBy, string searchString, int pageNumber)
         {
+            
             try
             {
                 _logger.LogInformation("This is just a log in GetAllPublishers()");
