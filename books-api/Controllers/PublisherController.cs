@@ -1,8 +1,11 @@
-﻿using books_api.Data.Services;
+﻿using books_api.ActionResults;
+using books_api.Data.Models;
+using books_api.Data.Services;
 using books_api.Data.ViewModels;
 using books_api.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +18,27 @@ namespace books_api.Controllers
     public class PublisherController : ControllerBase
     {
         private PublisherService _publisherService;
+        private readonly ILogger<PublisherController> _logger;
 
-        public PublisherController(PublisherService publisherService)
+        public PublisherController(PublisherService publisherService, ILogger<PublisherController> logger)
         {
             _publisherService = publisherService;
+            _logger = logger;
+        }
+
+        [HttpGet("get-all-publishers")]
+        public IActionResult GetAllPublishers(string sortBy, string searchString, int pageNumber)
+        {
+            try
+            {
+                _logger.LogInformation("This is just a log in GetAllPublishers()");
+                var _result = _publisherService.GetAllPublishers(sortBy, searchString, pageNumber);
+                return Ok(_result);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Sorry, we could not load the publishers");
+            }
         }
 
         [HttpPost("add-publisher")]
@@ -48,12 +68,13 @@ namespace books_api.Controllers
             if (_response != null)
             {
                 return Ok(_response);
+
             }
             else
             {
                 return NotFound();
+
             }
-            
         }
 
 

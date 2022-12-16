@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +47,15 @@ namespace books_api
             services.AddTransient<AuthorsService>();
             services.AddTransient<PublisherService>();
 
+            services.AddApiVersioning(config=> 
+            {
+                config.DefaultApiVersion = new ApiVersion(1,0);
+                config.AssumeDefaultVersionWhenUnspecified = true;
+
+                //config.ApiVersionReader = new HeaderApiVersionReader("custom-version-header");
+                //config.ApiVersionReader = new MediaTypeApiVersionReader();
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "books_api", Version = "v1" });
@@ -69,9 +79,10 @@ namespace books_api
             app.UseAuthorization();
 
             //exception handling
-
+            app.UseDeveloperExceptionPage();
             app.ConfigureBuildInExceptionHandler();
             //app.ConfigureCustemExceptionHandler();
+
 
             app.UseEndpoints(endpoints =>
             {
