@@ -73,7 +73,7 @@ namespace books_api.Data.Services
             return _publisher;
         }
 
-        public void GetAllAuthors() => _context.Authors.ToList();
+      
 
         public PublisherWithBooksAndAuthorsVM GetPublisherData(int publisherId)
         {
